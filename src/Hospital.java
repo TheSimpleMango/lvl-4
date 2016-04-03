@@ -1,18 +1,21 @@
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class Hospital {
-	private List<Doctor> doctors;
-	private List<Patient> patients;
+	private ArrayList<Doctor> doctors = new ArrayList<Doctor>();
+	private ArrayList<Patient> patients = new ArrayList<Patient>();
+	private ArrayList<Zombie> zombies = new ArrayList<Zombie>();
 
 	public Hospital() {
+		//
 	}
 
 	public void addDoctor(Doctor doctor) {
 		doctors.add(doctor);
 	}
 
-	public List<Doctor> getDoctors() {
-		List<Doctor> doctor = doctors;
+	public ArrayList<Doctor> getDoctors() {
+		ArrayList<Doctor> doctor = (ArrayList<Doctor>) doctors.clone();
 		return doctor;
 	}
 
@@ -20,80 +23,60 @@ public class Hospital {
 		patients.add(patient);
 	}
 
-	public List<Patient> getPatients() {
-		List<Patient> patient = patients;
-		return patient;
+	public ArrayList<Patient> getPatients() {
+		return patients;
 	}
 
 	public void assignPatientsToDoctors() {
-		// TODO Auto-generated method stub
-
-	}
-
-}
-
-class Doctor {
-	boolean performsSurgery = false;
-	boolean makesHouseCalls = false;
-	private List<Patient> patients;
-
-	public Object performsSurgery() {
-		return performsSurgery;
-	}
-
-	public void assignPatient(Patient patient) throws DoctorFullException {
-		if (patients.size() == 3) {
-			throw new DoctorFullException();
-		} else {
-			patients.add(patient);
+		int docI = 0;
+		for (int i = 0; i < patients.size(); i++) {
+			try {
+				doctors.get(docI).assignPatient(patients.get(i));
+			} catch (DoctorFullException e) {
+				docI++;
+				i--;
+			}
 		}
 	}
 
-	public Object makesHouseCalls() {
-		return makesHouseCalls;
+	public void add(Object object) {
+		if (object instanceof Doctor) {
+			Doctor x = (Doctor) object;
+			doctors.add(x);
+		} else if (object instanceof Patient) {
+			Patient y = (Patient) object;
+			patients.add(y);
+		}
 	}
 
-	public List<Patient> getPatients() {
-		List<Patient> patient = patients;
-		return patient;
+	public void makeDoctorsWork() {
+		for (Doctor doctor : doctors) {
+			doctor.doMedicine();
+		}
+		for (Patient patient : patients) {
+			System.out.println(patient.living);
+		}
+		int x = 1;
+		for (int i = 0; i < patients.size(); i++) {
+			Patient p = patients.get(i);
+			if (!p.living) {
+				zombies.add(new Zombie(new Date().toString()));
+				patients.remove(p);
+				x++;
+			}
+		}
+		System.out.println(x);
+		System.out.println("////");
+		for (Patient patient : patients) {
+			System.out.println(patient.living);
+		}
+		for (Zombie zombie : zombies) {
+			System.out.println(zombie);
+		}
 	}
 
-	public void doMedicine() {
-		// TODO Auto-generated method stub
-
-	}
-
-}
-
-class DoctorFullException extends Exception {
-
-}
-
-class GeneralPractitioner extends Doctor {
-	@Override
-	public Object makesHouseCalls() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-}
-
-class Surgeon extends Doctor {
-	@Override
-	public Object performsSurgery() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-}
-
-class Patient {
-	boolean caredFor = false;
-
-	public Object feelsCaredFor() {
-		return caredFor;
-	}
-
-	public void checkPulse() {
-		caredFor = true;
+	public ArrayList<Zombie> getZombies() {
+		return zombies;
 	}
 
 }
